@@ -17,12 +17,12 @@ FALL_STEPS = [2, 4, 6, 8, 10, 12, 16, 18, 20, 22, 24,
               26, 28, 32, 34, 36, 38, 40, 42, 44, 48]
 
 # touch procedure names
-touch_procs = {0 : "none", 1 : "battery", 2 : "teleport", 3 :"checkpoint",
-               4 : "killer", 5 : "floppy", 6 :  "exit",
-               7 : "special good", 8 : "special bad"}
+touch_procs = {0: "none", 1: "battery", 2: "teleport", 3: "checkpoint",
+               4: "killer", 5: "floppy", 6: "exit",
+               7: "special good", 8: "special bad"}
 
 
-#noinspection PySimplifyBooleanCheck,PyArgumentEqualDefault
+# noinspection PySimplifyBooleanCheck,PyArgumentEqualDefault
 class PlayerEntity(ga.FSM, ga.Entity):
     """
     Player's entity class, extends ga.Entity.
@@ -31,6 +31,7 @@ class PlayerEntity(ga.FSM, ga.Entity):
     Requires supplying ga.Controller class for player's input.
     Singleton by design.
     """
+
     def __init__(self, controller):
         ga.Entity.__init__(self, [da.EmptySprite()], XY(0, 0))
         ga.FSM.__init__(self)
@@ -86,7 +87,7 @@ class PlayerEntity(ga.FSM, ga.Entity):
         self.frames["RJUMP"] = len(self.sprites["RJUMP"])
         # entering teleport (reverse for leaving)
         self.sprites["TELE"] = [(36, 42), (37, 43), (38, 44),
-                                 (39, 45), (40, 46), (41, 47)]
+                                (39, 45), (40, 46), (41, 47)]
         self.frames["TELE"] = len(self.sprites["TELE"])
         self.switch_state(self.state_init)
         self.keys = 0  # keys needed to open the exit
@@ -94,8 +95,8 @@ class PlayerEntity(ga.FSM, ga.Entity):
         self.temp = 0  # weapons's temperature increase
         self.fired = False  # to disable repeated shots
         self.ammo = 0  # current ammo left
-        self.magazine = [0, 20, 15, 25, 10, 15] # # of shots for each weapon level
-        self.heat = [0,  1,  2,  1,  4,  3] # temperature increase for each level
+        self.magazine = [0, 20, 15, 25, 10, 15]  # # of shots for each weapon level
+        self.heat = [0, 1, 2, 1, 4, 3]  # temperature increase for each level
         self.cooldown = 0  # cooldown counter
 
     def display(self):
@@ -176,7 +177,7 @@ class PlayerEntity(ga.FSM, ga.Entity):
         # then horizontal movement
         side = XY(self.move_vector.x, 0)
         pside, touched = self.check_move(side, self.screen)
-        self.touched.extend(touched) # touch will be handled later
+        self.touched.extend(touched)  # touch will be handled later
         pos = self.get_position()
         pos += pside
         self.set_position(pos)
@@ -242,7 +243,6 @@ class PlayerEntity(ga.FSM, ga.Entity):
                 self.anim = ("LSTAND", "RSTAND")[self.orientation]
                 self.frame = 0
                 self.move_vector.x = 0
-
 
     def state_turn(self, init=False):
         """Handle turning state."""
@@ -511,22 +511,23 @@ class PlayerEntity(ga.FSM, ga.Entity):
         di.status_line.add(" | ammo: %d" % self.ammo)
 
     projectiles = {
-        "1_L" : { "offset" : XY(-38, 32), "step" : -28 },
-        "1_R" : { "offset" : XY(38, 32), "step" : 28 },
-        "2_L" : { "offset" : XY(-46, 32), "step" : -32 },
-        "2_R" : { "offset" : XY(46, 32), "step" : 32 },
-        "3_L" : { "offset" : XY(-46, 32), "step" : -28 },
-        "3_R" : { "offset" : XY(46, 32), "step" : 28 },
-        "4_L" : { "offset" : XY(-46, 32), "step" : -24 },
-        "4_R" : { "offset" : XY(46, 32), "step" : 24 },
-        "5_L" : { "offset" : XY(-36, 8), "step" : -32 },
-        "5_R" : { "offset" : XY(36, 8), "step" : 32 },
+        "1_L": {"offset": XY(-38, 32), "step": -28},
+        "1_R": {"offset": XY(38, 32), "step": 28},
+        "2_L": {"offset": XY(-46, 32), "step": -32},
+        "2_R": {"offset": XY(46, 32), "step": 32},
+        "3_L": {"offset": XY(-46, 32), "step": -28},
+        "3_R": {"offset": XY(46, 32), "step": 28},
+        "4_L": {"offset": XY(-46, 32), "step": -24},
+        "4_R": {"offset": XY(46, 32), "step": 24},
+        "5_L": {"offset": XY(-36, 8), "step": -32},
+        "5_R": {"offset": XY(36, 8), "step": 32},
     }
 
     def fire_weapon(self):
         """
         Fire the weapon!
         """
+
         def add_projectile(type, pos=None):
             if not pos:
                 ppos = self.get_position().copy() + self.projectiles[type]["offset"]
@@ -552,7 +553,7 @@ class PlayerEntity(ga.FSM, ga.Entity):
                     self.select_weapon(self.power - 1)
 
 
-#noinspection PyArgumentEqualDefault
+# noinspection PyArgumentEqualDefault
 class Projectile(ga.Entity):
     def __init__(self, type):
         ga.Entity.__init__(self, [da.EmptySprite()], XY(0, 0))
@@ -576,12 +577,14 @@ class Projectile(ga.Entity):
             sprite = self.sprites[1]
             gl.display.blit(sprite.image, self.get_position() + XY(0, gl.SPRITE_Y))
 
+
 # -----------------------------------------------------------------------------
 # test code below
 
 
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()

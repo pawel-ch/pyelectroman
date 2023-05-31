@@ -10,7 +10,7 @@ import emother as ot
 import pygame
 import logging
 import time
-
+            
 
 class Gameplay:
     """
@@ -50,52 +50,49 @@ class Gameplay:
                              pygame.K_0: self.on_k_0}
         self.deferred = None
 
-    def init_map(self):
+    @staticmethod
+    def init_map():
         """Initialize level map"""
         # pylint: disable-msg=E1121
         screens_map = pygame.Surface((32, 32))
         pixels = pygame.PixelArray(screens_map)
         # pylint: enable-msg=E1121
-        FULL = 0x33AA33
-        EMPTY = 0x333333
+        full = 0x33AA33
+        empty = 0x333333
         screens = gl.screen_manager.get_screens()
         for scr in range(256):
             if screens[scr]:
-                pixels[(scr % 16) * 2 + 0][(scr / 16) * 2 + 0] = FULL
-                pixels[(scr % 16) * 2 + 1][(scr / 16) * 2 + 0] = FULL
-                pixels[(scr % 16) * 2 + 0][(scr / 16) * 2 + 1] = FULL
-                pixels[(scr % 16) * 2 + 1][(scr / 16) * 2 + 1] = FULL
+                pixels[(scr % 16) * 2 + 0][(scr // 16) * 2 + 0] = full
+                pixels[(scr % 16) * 2 + 1][(scr // 16) * 2 + 0] = full
+                pixels[(scr % 16) * 2 + 0][(scr // 16) * 2 + 1] = full
+                pixels[(scr % 16) * 2 + 1][(scr // 16) * 2 + 1] = full
             else:
-                pixels[(scr % 16) * 2 + 0][(scr / 16) * 2 + 0] = EMPTY
-                pixels[(scr % 16) * 2 + 1][(scr / 16) * 2 + 0] = EMPTY
-                pixels[(scr % 16) * 2 + 0][(scr / 16) * 2 + 1] = EMPTY
-                pixels[(scr % 16) * 2 + 1][(scr / 16) * 2 + 1] = EMPTY
+                pixels[(scr % 16) * 2 + 0][(scr // 16) * 2 + 0] = empty
+                pixels[(scr % 16) * 2 + 1][(scr // 16) * 2 + 0] = empty
+                pixels[(scr % 16) * 2 + 0][(scr // 16) * 2 + 1] = empty
+                pixels[(scr % 16) * 2 + 1][(scr // 16) * 2 + 1] = empty
         del pixels
         return screens_map
 
     def show_map(self, pos):
         """Display level map (for debug only)"""
         scr = gl.screen_manager.get_screen_number()
-        CURRENT = 0xFFFFFF
+        current = 0xFFFFFF
         # pylint: disable-msg=E1121
         screens_map_copy = pygame.Surface((32, 32))
         screens_map_copy.blit(self.screens_map, (0, 0))
         pixels = pygame.PixelArray(screens_map_copy)
         # pylint: enable-msg=E1121
-        pixels[(scr % 16) * 2 + 0][(scr / 16) * 2 + 0] = CURRENT
-        pixels[(scr % 16) * 2 + 1][(scr / 16) * 2 + 0] = CURRENT
-        pixels[(scr % 16) * 2 + 0][(scr / 16) * 2 + 1] = CURRENT
-        pixels[(scr % 16) * 2 + 1][(scr / 16) * 2 + 1] = CURRENT
+        pixels[(scr % 16) * 2 + 0][(scr // 16) * 2 + 0] = current
+        pixels[(scr % 16) * 2 + 1][(scr // 16) * 2 + 0] = current
+        pixels[(scr % 16) * 2 + 0][(scr // 16) * 2 + 1] = current
+        pixels[(scr % 16) * 2 + 1][(scr // 16) * 2 + 1] = current
         del pixels
         gl.window.blit(screens_map_copy, pos)
 
-    def show_info(self):
-        """Display status line"""
-        di.status_line.show()
-
     def display_screen(self, screen):
         """Display all objects (active and background) on the screen"""
-        gl.screen_manager.update_active() # make sure newly created objects get displayed
+        gl.screen_manager.update_active()  # make sure newly created objects get displayed
         if screen:
             for entity in screen.background:
                 entity.display()
@@ -113,15 +110,18 @@ class Gameplay:
         for deferred in self.deferred:
             deferred()
 
-    def display_hero(self):
+    @staticmethod
+    def display_hero():
         """Display player's character"""
         gl.player.display()
 
-    def display_indicators(self):
+    @staticmethod
+    def display_indicators():
         """Display weapon indicators (and other icons)"""
         di.indicators.display()
 
-    def move_player(self, offset):
+    @staticmethod
+    def move_player(offset):
         position = gl.player.get_position() + offset
         gl.player.set_position(position)
 
@@ -161,7 +161,8 @@ class Gameplay:
             if gl.player.get_y() <= ((gl.SCREEN_Y + 2) * gl.SPRITE_Y):
                 self.move_player((0, gl.SPRITE_Y))
 
-    def on_k_tab(self):
+    @staticmethod
+    def on_k_tab():
         gl.show_collisions = False if gl.show_collisions else True
 
     def on_k_1(self):
@@ -211,11 +212,13 @@ class Gameplay:
         gl.current_level = 7
         self.load_level()
 
-    def on_k_0(self):
+    @staticmethod
+    def on_k_0():
         if pygame.key.get_mods() & pygame.KMOD_SHIFT:
             gl.player.select_weapon(0)
 
-    def on_k_escape(self):
+    @staticmethod
+    def on_k_escape():
         gl.loop_main_loop = False
 
     def load_level(self):
@@ -224,26 +227,28 @@ class Gameplay:
         self.screens_map = self.init_map()
         start_screen = gl.checkpoint.get_screen()
         start_position = gl.checkpoint.get_position()
-        gl.disks = 0 # no disks collected after level load
+        gl.disks = 0  # no disks collected after level load
         if start_position:
-            start_position += XY(gl.SPRITE_X / 2, gl.SPRITE_Y)
+            start_position += XY(gl.SPRITE_X // 2, gl.SPRITE_Y)
             gl.screen_manager.change_screen(start_screen)
             gl.player.stand(start_position)
 
-    def loop_begin(self):
+    @staticmethod
+    def loop_begin():
         di.clear_screen()
 
     def loop_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 gl.loop_main_loop = False
-        keys = pygame.key.get_pressed()
-        for key, state in enumerate(keys):
-            if (key in self.key_handlers) and state:
-                self.key_handlers[key]()
+        pressed_keys = pygame.key.get_pressed()
+        for key, state in self.key_handlers.items():
+            if pressed_keys[key]:
+                state()
         self.controller.update()
 
-    def loop_run(self):
+    @staticmethod
+    def loop_run():
         gl.screen = gl.screen_manager.get_screen()
         if gl.screen:
             for active in gl.screen.active:
@@ -258,9 +263,10 @@ class Gameplay:
         self.show_map((640 - 32 - 8, 8))
         self.show_info()
 
-    def show(self):
+    @staticmethod
+    def show():
         """Display the screen."""
-        di.message(XY(500, 8),"logic: {0:>4.1f}\nrender: {1:>4.1f}".format(
+        di.message(XY(500, 8), "logic: {0:>4.1f}\nrender: {1:>4.1f}".format(
             round(gl.logic_time * 1000, 1), round(gl.render_time * 1000, 1)))
         di.show()
 
@@ -272,23 +278,28 @@ class Gameplay:
         clock = pygame.time.Clock()
         while gl.loop_main_loop:
             # logic processing starts here
-            logic_start = time.clock()
+            logic_start = time.time()
             self.loop_begin()
             self.loop_events()
             self.loop_run()
-            gl.logic_time = time.clock() - logic_start
+            gl.logic_time = time.time() - logic_start
             # logic processing ended
             # rendering starts here
-            render_start = time.clock()
+            render_start = time.time()
             self.loop_end()
-            gl.render_time = time.clock() - render_start
+            gl.render_time = time.time() - render_start
             # rendering ended
-            self.show() # show the screen
+            self.show()  # show the screen
             gl.counter += 1
             clock.tick(20)  # keep constant frame rate (20fps)
 
     def stop(self):
         pass
+
+
+def show_info():
+    """Display status line"""
+    di.status_line.show()
 
 
 class Game:
@@ -302,31 +313,35 @@ class Game:
         else:
             logging.basicConfig(filename=gl.log_filename,
                                 filemode="w", format=(
-                                '%(levelname)s: %(funcName)s(): %(message)s'),
+                                    '%(levelname)s: %(funcName)s(): %(message)s'),
                                 level=logging.DEBUG)
 
-    def init(self):
+    @staticmethod
+    def init():
         di.init_display()
         di.info_lines.add("pyelectroman started")
-        time.clock()
 
-    def quit(self):
+    @staticmethod
+    def quit():
         di.quit_display()
 
-def fast_main():
-    game = Game()
-    game.init()
-    gameplay = Gameplay()
-    gameplay.start()
-    gameplay.run()
-    gameplay.stop()
-    game.quit()
+    @staticmethod
+    def fast_main():
+        game = Game()
+        game.init()
+        gameplay = Gameplay()
+        gameplay.start()
+        gameplay.run()
+        gameplay.stop()
+        game.quit()
 
 
 def profile_main():
     # This is the main function for profiling
     # We've renamed our original main() above to real_main()
-    import cProfile, pstats, StringIO
+    import cProfile
+    import pstats
+    import StringIO
     prof = cProfile.Profile()
     prof = prof.runctx("real_main()", globals(), locals())
     stream = StringIO.StringIO()
@@ -334,12 +349,11 @@ def profile_main():
     stats.sort_stats("calls")
     stats.print_stats(80)  # how many to print
     # The rest is optional.
-    #stats.print_callees()
-    #stats.print_callers()
+    # stats.print_callees()
+    # stats.print_callers()
     logging.info("Profile data:\n%s", stream.getvalue())
 
+    main = fast_main()
 
-main = fast_main
-
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()

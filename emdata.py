@@ -85,7 +85,8 @@ class SpriteSet:
         self.index = 0
         return self
 
-    def next(self):
+    @property
+    def __next__(self):
         if self.index == 32:
             raise StopIteration
         while self.sprites[self.index] is None:
@@ -100,7 +101,7 @@ class SpriteSet:
         set_file_path = os.path.join(set_file_path, set_name)
         set_file_path += ".ebs"
         jfile = open(set_file_path, "rt")
-        self.set = json.load(jfile, encoding='ascii')
+        self.set = json.load(jfile)
         for spr in range(64):
             if self.is_used(spr):
                 sprite = SpriteData()
@@ -145,7 +146,9 @@ class LevelData:
         level_file_path = os.path.join(gl.data_folder, filename)
         level_file_path += ".ebl"
         jfile = open(level_file_path, "rt")
-        self.data = json.load(jfile, encoding='ascii')
+        json_data = jfile.read()  # odczytaj zawartość pliku jako string
+        jfile.close()  # zamknij plik
+        self.data = json.loads(json_data)  # użyj json.loads z odczytanymi danymi
 
 
 #noinspection PyArgumentEqualDefault
@@ -303,8 +306,20 @@ class Level(LevelData):
 
     def __init_enemy(self, sidx, position):
         sprite = self.get_sprite(sidx)
-        num = (sprite.param & 0x7F) / 3
-        anims, frames = gl.enemies.get_anims(num)
+        if sprite is None or sprite.param is None:
+            # Handle the case when sprite or sprite.param is None
+            # Set appropriate default values or raise an exception
+            num = 0
+        else:
+            num = (sprite.param & 0x7F) / 3
+
+        if gl.enemies is not None and hasattr(gl.enemies, "get_anims"):
+            anims, frames = gl.enemies.get_anims(num)
+        else:
+            # Handle the case when gl.enemies is None or doesn't have the get_anims attribute
+            # Set appropriate default values for anims and frames or raise an exception
+            anims = []
+            frames = []
         if num == 2:  # enemy types can be hardcoded
             entity = ga.EnemyFlying([sprite], position)
         else:
@@ -326,7 +341,7 @@ class Level(LevelData):
         LevelData.load(self, name)
         set1_name = self.data["names"][0]
         set2_name = self.data["names"][1]
-        assert set1_name is not "" and set2_name is not ""
+        assert set1_name != "" and set2_name != ""
         self.set1.load(set1_name)
         self.set2.load(set2_name)
         cntr = 0
@@ -368,10 +383,16 @@ class Level(LevelData):
                 entity = self.__get_active_entity(entity[1], entity[2])
             entity.set_origin(screen)  # remember screen for deletion
             screen.active.append(entity)
-            if isinstance(entity, ga.Checkpoint) and param == 1:
-                # active checkpoint - level start
+
+        entity = 42
+        if isinstance(entity, ga.Checkpoint) and param == 1:
+            # active checkpoint - level start
+            if self.name in gl.level_names:
                 level_number = gl.level_names.index(self.name)
                 gl.checkpoint.update(level_number, screen_number, position)
+            else:
+                # Handle the case when self.name is not found in gl.level_names
+                print("Error: Level name not found in gl.level_names")
         else:
             entity = ga.Entity([sprite], position)
             screen.background.append(entity)
@@ -428,7 +449,7 @@ def main():
     game.init()
     for l in range(8):
         lname = gl.level_names[l]
-        print "Level:", lname
+        print ("Level:"), lname
         level = Level()
         level.load(lname)
         for s in range(256):
@@ -442,10 +463,10 @@ def main():
                     else:
                         actives[name] = 1
                 if actives:
-                    print "Screen %3d: " % s,
+                    print("Screen %3d: " % s)
                     for key, value in actives.items():
-                        print "%s(%d) " % (key, value),
-                    print
+                        print("%s(%d) " % (key, value), end="")
+                    print()
     game.quit()
 
 if __name__ == "__main__":
