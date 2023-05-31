@@ -1,22 +1,23 @@
 """Main game module"""
 
-import emglobals as gl
-from emglobals import XY
+import logging
+
 import emdata as da
-import emgame as ga
 import emdisplay as di
+import emgame as ga
+import emglobals as gl
 import emhero as pl
 import emother as ot
 import pygame
-import logging
-import time
-            
+from emglobals import XY
+
 
 class Gameplay:
     """
     Main gameplay functionality class.
     Singleton by design.
     """
+
     def __init__(self):
         gl.data_folder = "data"
         gl.level = da.Level()
@@ -50,8 +51,7 @@ class Gameplay:
                              pygame.K_0: self.on_k_0}
         self.deferred = None
 
-    @staticmethod
-    def init_map():
+    def init_map(self):
         """Initialize level map"""
         # pylint: disable-msg=E1121
         screens_map = pygame.Surface((32, 32))
@@ -110,18 +110,15 @@ class Gameplay:
         for deferred in self.deferred:
             deferred()
 
-    @staticmethod
-    def display_hero():
+    def display_hero(self):
         """Display player's character"""
         gl.player.display()
 
-    @staticmethod
-    def display_indicators():
+    def display_indicators(self):
         """Display weapon indicators (and other icons)"""
         di.indicators.display()
 
-    @staticmethod
-    def move_player(offset):
+    def move_player(self, _):
         position = gl.player.get_position() + offset
         gl.player.set_position(position)
 
@@ -150,7 +147,7 @@ class Gameplay:
             gl.screen_manager.change_screen(cs)
         elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
             if gl.player.get_y() >= -2 * gl.SPRITE_Y:
-                self.move_player((0, -gl.SPRITE_Y))
+                self.move_player(0)
 
     def on_k_down(self):
         cs = gl.screen_manager.get_screen_number()
@@ -159,10 +156,9 @@ class Gameplay:
             gl.screen_manager.change_screen(cs)
         elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
             if gl.player.get_y() <= ((gl.SCREEN_Y + 2) * gl.SPRITE_Y):
-                self.move_player((0, gl.SPRITE_Y))
+                self.move_player(0)
 
-    @staticmethod
-    def on_k_tab():
+    def on_k_tab(self):
         gl.show_collisions = False if gl.show_collisions else True
 
     def on_k_1(self):
@@ -212,13 +208,11 @@ class Gameplay:
         gl.current_level = 7
         self.load_level()
 
-    @staticmethod
-    def on_k_0():
+    def on_k_0(self):
         if pygame.key.get_mods() & pygame.KMOD_SHIFT:
             gl.player.select_weapon(0)
 
-    @staticmethod
-    def on_k_escape():
+    def on_k_escape(self):
         gl.loop_main_loop = False
 
     def load_level(self):
@@ -233,8 +227,7 @@ class Gameplay:
             gl.screen_manager.change_screen(start_screen)
             gl.player.stand(start_position)
 
-    @staticmethod
-    def loop_begin():
+    def loop_begin(self):
         di.clear_screen()
 
     def loop_events(self):
@@ -247,8 +240,7 @@ class Gameplay:
                 state()
         self.controller.update()
 
-    @staticmethod
-    def loop_run():
+    def loop_run(self):
         gl.screen = gl.screen_manager.get_screen()
         if gl.screen:
             for active in gl.screen.active:
@@ -263,8 +255,7 @@ class Gameplay:
         self.show_map((640 - 32 - 8, 8))
         self.show_info()
 
-    @staticmethod
-    def show():
+    def show(self):
         """Display the screen."""
         di.message(XY(500, 8), "logic: {0:>4.1f}\nrender: {1:>4.1f}".format(
             round(gl.logic_time * 1000, 1), round(gl.render_time * 1000, 1)))
@@ -307,26 +298,23 @@ class Game:
     Main game class.
     Singleton by design.
     """
+
     def __init__(self):
         if gl.log_filename:
             logging.basicConfig(level=logging.DEBUG)
         else:
             logging.basicConfig(filename=gl.log_filename,
-                                filemode="w", format=(
-                                    '%(levelname)s: %(funcName)s(): %(message)s'),
+                                filemode="w", format='%(levelname)s: %(funcName)s(): %(message)s',
                                 level=logging.DEBUG)
 
-    @staticmethod
-    def init():
+    def init(self):
         di.init_display()
         di.info_lines.add("pyelectroman started")
 
-    @staticmethod
-    def quit():
+    def quit(self):
         di.quit_display()
 
-    @staticmethod
-    def fast_main():
+    def fast_main(self):
         game = Game()
         game.init()
         gameplay = Gameplay()
@@ -339,9 +327,7 @@ class Game:
 def profile_main():
     # This is the main function for profiling
     # We've renamed our original main() above to real_main()
-    import cProfile
-    import pstats
-    import StringIO
+    import cProfile, pstats, StringIO
     prof = cProfile.Profile()
     prof = prof.runctx("real_main()", globals(), locals())
     stream = StringIO.StringIO()
