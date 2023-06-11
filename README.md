@@ -8,4 +8,4 @@ The project intends to recreate the functionality of the original to some extent
 
 This is author's side project - the updates are when the time is permitting him to work on it.
 
-Dependencies: pygame and everything pygame depends on. Probably needs at least Python 2.7+ (obviously not 3+) as well.
+Dependencies: Python 3.x (tested in Python 3.11), pygame and pypng.
