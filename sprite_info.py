@@ -40,9 +40,7 @@ class SpriteData:
 def load_data(filename):
     global sprites
     global areas
-    set_path = os.path.join(
-        r"C:\Users\Grzegorz\Downloads\pyelectroman-master\data", filename
-    )
+    set_path = os.path.join("data", filename)
     params_path = os.path.join(set_path, filename + ".ebs")
     f = open(params_path, "rt")
     data = json.load(f)

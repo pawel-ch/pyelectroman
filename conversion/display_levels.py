@@ -6,7 +6,7 @@ import sys
 
 import png
 
-folder = r"D:\PyEB\conversion\newdata"
+folder = os.path.join("..", "data")
 names = []
 screens = []
 sprites = [None] * 128

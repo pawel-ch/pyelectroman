@@ -398,8 +398,8 @@ class GGSFile:
 
 def main():
     try:
-        folder = r"D:\PyEB\conversion\olddata"
-        destination = r"D:\PyEB\conversion\newdata"
+        folder = "olddata"
+        destination = os.path.join("..", "data")
         all_files = glob.glob(os.path.join(folder, "*.ggs"))
         for filename in all_files:
             fname = os.path.split(filename)[1]
