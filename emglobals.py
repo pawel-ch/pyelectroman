@@ -8,10 +8,7 @@ import copy
 
 # PyGame related globals
 
-font = {"xsmall": None,
-        "small": None,
-        "normal": None,
-        "large": None}
+font = {"xsmall": None, "small": None, "normal": None, "large": None}
 
 small_font = None
 medium_font = None
@@ -23,7 +20,7 @@ window = None  # gameplay window subsurface
 SPRITE_X = 48  # size in pixels
 SPRITE_Y = 48  # size in pixels
 SCREEN_X = 13  # size in sprites
-SCREEN_Y = 8   # size in sprites
+SCREEN_Y = 8  # size in sprites
 MAX_X = SPRITE_X * SCREEN_X  # screen size in pixels
 MAX_Y = SPRITE_Y * SCREEN_Y  # screen size in pixels
 
@@ -36,8 +33,7 @@ show_collisions = False
 
 # data related globals
 data_folder = r"data"  # defaul data folder
-level_names = ["elek", "koryt", "mieszk", "magaz",
-               "fiolet", "10x10", "sluzy", "widok"]
+level_names = ["elek", "koryt", "mieszk", "magaz", "fiolet", "10x10", "sluzy", "widok"]
 current_level = 0  # current level number
 level = None  # currently loaded level
 
@@ -52,8 +48,8 @@ enemies = None  # data class for enemies
 weapons = None  # data class for weapons
 screen = None  # current screen definition
 info = None  # data class for info sprites
-counter = 0 # +1 every loop
-disks = 0 # number of disks collected
+counter = 0  # +1 every loop
+disks = 0  # number of disks collected
 
 # random numbers for active screen
 screen_randoms = []
@@ -64,12 +60,14 @@ for r in range(SCREEN_X):
 
 log_filename = "em.log"  # empty string disables logging to file
 render_time = 0  # rendering time
-logic_time = 0   # logic processing time
+logic_time = 0  # logic processing time
 
 # global classes
 
+
 class XY:
     """Class to keep x, y positions."""
+
     def __init__(self, x=0, y=0):
         if not isinstance(x, int):
             raise ValueError("x must be an int.")
@@ -105,8 +103,7 @@ class XY:
         if isinstance(other, tuple) and len(other) == 2:
             other = XY.from_tuple(other)
         if not isinstance(other, XY):
-            raise NotImplementedError(
-                "Only XY() or (x, y) addition implemented.")
+            raise NotImplementedError("Only XY() or (x, y) addition implemented.")
         x = self.x + other.x
         y = self.y + other.y
         return XY(x, y)
@@ -116,12 +113,11 @@ class XY:
         if isinstance(other, tuple) and len(other) == 2:
             other = XY.from_tuple(other)
         if not isinstance(other, XY):
-            raise NotImplementedError(
-                "Only XY() or (x, y) addition implemented.")
+            raise NotImplementedError("Only XY() or (x, y) addition implemented.")
         x = self.x - other.x
         y = self.y - other.y
         return XY(x, y)
-		
+
     def __str__(self):
         """Return human-readable representation."""
         return "XY(%d, %d)" % (self.x, self.y)
@@ -153,6 +149,7 @@ class XY:
 
 # other global functions
 
+
 def init_screen_randoms(screen_number):
     srand(256 * screen_number + screen_number)
     random(256)  # additional call for compatibility reasons
@@ -160,9 +157,10 @@ def init_screen_randoms(screen_number):
         screen_randoms[i] = random(256)
     srand(256 * screen_number + screen_number)
 
+
 # Borland C 3.1 rand()
 
-MULTIPLIER = 0x015a4e35
+MULTIPLIER = 0x015A4E35
 INCREMENT = 1
 rand_seed = 1
 
@@ -181,13 +179,14 @@ def rand():
     }
     """
     global rand_seed
-    rand_seed = (MULTIPLIER * rand_seed + INCREMENT)
+    rand_seed = MULTIPLIER * rand_seed + INCREMENT
     return (rand_seed >> 16) & 0x7FFF
 
 
 def random(num):
-    """ #define random(num)(int)(((long)rand()*(num))/(RAND_MAX+1)) """
+    """#define random(num)(int)(((long)rand()*(num))/(RAND_MAX+1))"""
     return int((rand() * num) // 0x8000)
+
 
 # -----------------------------------------------------------------------------
 # test code below
@@ -207,6 +206,7 @@ def main():
     print(screen_randoms)
     init_screen_randoms(34)
     print(screen_randoms)
+
 
 if __name__ == "__main__":
     main()

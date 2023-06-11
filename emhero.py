@@ -1,25 +1,56 @@
 """Hero's (player's character) code"""
 
-import emglobals as gl
-from emglobals import XY
-import emdisplay as di
-import emdata as da
-import emgame as ga
-import pygame
 import copy
 import logging
+
+import pygame
+
+import emdata as da
+import emdisplay as di
+import emgame as ga
+import emglobals as gl
+from emglobals import XY
 
 # horizontal move vector
 MOVE_STEP = 8
 # jump vectors LUT based on the PC version
 JUMP_STEPS = [20, 18, 16, 12, 10, 8, 6, 4, 2, 0]
-FALL_STEPS = [2, 4, 6, 8, 10, 12, 16, 18, 20, 22, 24,
-              26, 28, 32, 34, 36, 38, 40, 42, 44, 48]
+FALL_STEPS = [
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    16,
+    18,
+    20,
+    22,
+    24,
+    26,
+    28,
+    32,
+    34,
+    36,
+    38,
+    40,
+    42,
+    44,
+    48,
+]
 
 # touch procedure names
-touch_procs = {0: "none", 1: "battery", 2: "teleport", 3: "checkpoint",
-               4: "killer", 5: "floppy", 6: "exit",
-               7: "special good", 8: "special bad"}
+touch_procs = {
+    0: "none",
+    1: "battery",
+    2: "teleport",
+    3: "checkpoint",
+    4: "killer",
+    5: "floppy",
+    6: "exit",
+    7: "special good",
+    8: "special bad",
+}
 
 
 # noinspection PySimplifyBooleanCheck,PyArgumentEqualDefault
@@ -61,14 +92,32 @@ class PlayerEntity(ga.FSM, ga.Entity):
         self.sprites["RSTAND"] = [(2, 3)]
         self.frames["RSTAND"] = len(self.sprites["RSTAND"])
         # walking left
-        self.sprites["LWALK"] = [(4, 5), (4, 6), (4, 7), (4, 8),
-                                 (4, 9), (4, 10), (4, 11), (4, 12),
-                                 (4, 13), (4, 14)]
+        self.sprites["LWALK"] = [
+            (4, 5),
+            (4, 6),
+            (4, 7),
+            (4, 8),
+            (4, 9),
+            (4, 10),
+            (4, 11),
+            (4, 12),
+            (4, 13),
+            (4, 14),
+        ]
         self.frames["LWALK"] = len(self.sprites["LWALK"])
         # walking right
-        self.sprites["RWALK"] = [(15, 16), (15, 17), (15, 18), (15, 19),
-                                 (15, 20), (15, 21), (15, 22), (15, 23),
-                                 (15, 24), (15, 25)]
+        self.sprites["RWALK"] = [
+            (15, 16),
+            (15, 17),
+            (15, 18),
+            (15, 19),
+            (15, 20),
+            (15, 21),
+            (15, 22),
+            (15, 23),
+            (15, 24),
+            (15, 25),
+        ]
         self.frames["RWALK"] = len(self.sprites["RWALK"])
         # turning left to right (play in reverse for right to left turn)
         self.sprites["TURN"] = [(26, 29), (27, 30), (28, 31)]
@@ -86,8 +135,14 @@ class PlayerEntity(ga.FSM, ga.Entity):
         self.sprites["RJUMP"] = [(15, 19)]
         self.frames["RJUMP"] = len(self.sprites["RJUMP"])
         # entering teleport (reverse for leaving)
-        self.sprites["TELE"] = [(36, 42), (37, 43), (38, 44),
-                                (39, 45), (40, 46), (41, 47)]
+        self.sprites["TELE"] = [
+            (36, 42),
+            (37, 43),
+            (38, 44),
+            (39, 45),
+            (40, 46),
+            (41, 47),
+        ]
         self.frames["TELE"] = len(self.sprites["TELE"])
         self.switch_state(self.state_init)
         self.keys = 0  # keys needed to open the exit
@@ -453,7 +508,7 @@ class PlayerEntity(ga.FSM, ga.Entity):
         if below > 0:
             cs += 16 if cs < 240 else -240
             gl.screen_manager.change_screen(cs)
-            pos.y = - (bbox.y + bbox.h - below)
+            pos.y = -(bbox.y + bbox.h - below)
             self.set_position(pos)
         center = bbox.centerx + pos.x
         cs = gl.screen_manager.get_screen_number()
@@ -483,11 +538,13 @@ class PlayerEntity(ga.FSM, ga.Entity):
             self.run_fsm()
         # handle shooting
         if self.controller.fire:
-            if self.state in [self.state_jump,
-                              self.state_fall,
-                              self.state_land,
-                              self.state_move,
-                              self.state_stand]:
+            if self.state in [
+                self.state_jump,
+                self.state_fall,
+                self.state_land,
+                self.state_move,
+                self.state_stand,
+            ]:
                 if not self.fired:
                     self.fire_weapon()
                     self.fired = True
@@ -503,8 +560,7 @@ class PlayerEntity(ga.FSM, ga.Entity):
         self.show_hud()
         # display some status information
         di.status_line.add("%s" % str(self.position))
-        di.status_line.add(" | screen: %d" %
-                           gl.screen_manager.get_screen_number())
+        di.status_line.add(" | screen: %d" % gl.screen_manager.get_screen_number())
         di.status_line.add(" | running state: %s " % self.state.__name__)
         if self.touched:
             di.status_line.add(" | touching: %d" % len(self.touched))
@@ -565,7 +621,7 @@ class Projectile(ga.Entity):
     def update(self):
         self.frame = (self.frame + 1) % len(self.sprites)
         self.position.x += self.step
-        if self.position.x > gl.SCREEN_X * gl.SPRITE_X or self.position.x < - gl.SPRITE_X:
+        if self.position.x > gl.SCREEN_X * gl.SPRITE_X or self.position.x < -gl.SPRITE_X:
             self.vanish()
 
     def display(self):

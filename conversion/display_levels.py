@@ -1,17 +1,19 @@
-import json
-import png
-import os
 import copy
-import sys
 import glob
+import json
+import os
+import sys
 
-folder  = r"D:\PyEB\conversion\newdata"
+import png
+
+folder = r"D:\PyEB\conversion\newdata"
 names = []
 screens = []
 sprites = [None] * 128
 
+
 def load_sprite(filename):
-    filename = filename.encode('ascii')
+    filename = filename.encode("ascii")
     if os.path.exists(filename):
         r = png.Reader(filename)
         sprite = r.asRGBA()
@@ -21,10 +23,11 @@ def load_sprite(filename):
     else:
         return None
 
+
 def load_sprites(set1, set2):
     global sprites
     print("Loading sprite sets: %s, %s" % (set1, set2))
-    for sprite in range(1,128):
+    for sprite in range(1, 128):
         snum = (sprite, sprite - 64)[sprite >= 64]
         if sprite < 64:
             sfilebase = os.path.join(folder, set1)
@@ -37,14 +40,16 @@ def load_sprites(set1, set2):
         sfile = sfilebase + "_%02d.png" % snum
         sprites[sprite] = load_sprite(sfile)
 
+
 def load_level(filename):
     f = open(filename, "rt")
-    level = json.load(f, encoding='ascii')
+    level = json.load(f, encoding="ascii")
     print("Loading level:", filename)
     global names, screens
     names = level["names"]
     screens = level["screens"]
     load_sprites(names[0], names[1])
+
 
 def combine_screen_layers(s):
     screen = screens[s]
@@ -73,11 +78,13 @@ def combine_screen_layers(s):
                                         png_data[py][px + 0] = row[dc + 0]
                                         png_data[py][px + 1] = row[dc + 1]
                                         png_data[py][px + 2] = row[dc + 2]
-    if ((s + 1) % 16 == 0):
+    if (s + 1) % 16 == 0:
         print()
     return png_data
 
+
 TY = 16
+
 
 def main():
     levels = glob.glob(os.path.join(folder, "*.dat"))
@@ -99,10 +106,11 @@ def main():
                 png_data[srow].extend(data)
         print("Writing %s file..." % (lname + ".png"))
         f = open(lname + ".png", "wb")
-        w = png.Writer(width = 24 * 13 * 16, height = 24 * 8 * TY, alpha = False)
+        w = png.Writer(width=24 * 13 * 16, height=24 * 8 * TY, alpha=False)
         w.write(f, png_data)
         f.close()
     print("Done.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

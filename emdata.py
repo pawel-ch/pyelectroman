@@ -1,16 +1,25 @@
 """Data loading and preprocessing module"""
 
-import emglobals as gl
-from emglobals import XY
-import emgame as ga
 import json
-import os
 import logging
+import os
+
 import pygame
 
-flag_masks = {"active" : 0x80, "touchable" : 0x40, "shootable" : 0x20,
-              "stays_active" : 0x10, "destroyable" : 0x08,
-              "in_front" : 0x04, "last_frame" : 0x02, "first_frame" : 0x01}
+import emgame as ga
+import emglobals as gl
+from emglobals import XY
+
+flag_masks = {
+    "active": 0x80,
+    "touchable": 0x40,
+    "shootable": 0x20,
+    "stays_active": 0x10,
+    "destroyable": 0x08,
+    "in_front": 0x04,
+    "last_frame": 0x02,
+    "first_frame": 0x01,
+}
 
 
 class SpriteData:
@@ -31,8 +40,7 @@ class SpriteData:
         self.__init__()
         self.sidx = number
         set_file_path = os.path.join(gl.data_folder, set_name)
-        image_file_path = os.path.join(set_file_path,
-                                       set_name + "_%02d.png" % number)
+        image_file_path = os.path.join(set_file_path, set_name + "_%02d.png" % number)
         self.image = pygame.image.load(image_file_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (gl.SPRITE_X, gl.SPRITE_Y))
         # set up sprite information from status bytes
@@ -109,11 +117,14 @@ class SpriteSet:
                 self.sprites.append(sprite)
             else:
                 self.sprites.append(None)
-        logging.info("Sprite set '%s' loaded: %d sprites",
-                     set_name, 64 - self.sprites.count(None))
+        logging.info(
+            "Sprite set '%s' loaded: %d sprites",
+            set_name,
+            64 - self.sprites.count(None),
+        )
 
     def get_status_bytes(self, sprite):
-        return self.set["status table"][sprite * 8:sprite * 8 + 8]
+        return self.set["status table"][sprite * 8 : sprite * 8 + 8]
 
     def is_used(self, sprite):
         return self.set["used table"][sprite]
@@ -151,7 +162,7 @@ class LevelData:
         self.data = json.loads(json_data)  # użyj json.loads z odczytanymi danymi
 
 
-#noinspection PyArgumentEqualDefault
+# noinspection PyArgumentEqualDefault
 class Level(LevelData):
     def __init__(self):
         LevelData.__init__(self)
@@ -160,35 +171,35 @@ class Level(LevelData):
         self.screens = []
         self.start = None
         self.name = None
-        self.init_functions = {1: self.__init_cycle,
-                               2: self.__init_pulse,
-                               3: self.__init_monitor,
-                               4: self.__init_display,
-                               5: self.__init_cycleplus,
-                               6: self.__init_pulseplus,
-                               7: self.__init_flashplus,
-                               9: self.__init_rocketup,
-                               10: self.__init_rocketdown,
-                               11: self.__init_killingfloor,
-                               12: self.__init_checkpoint,
-                               13: self.__init_teleport,
-                               14: self.__init_flash,
-                               15: self.__init_exit,
-                               16: self.__init_enemy,
-                               17: self.__init_cannonleft,
-                               18: self.__init_cannonright,
-                               19: self.__init_cannonup,
-                               20: self.__init_cannondown,
-                               21: self.__init_flashspecial}
-
+        self.init_functions = {
+            1: self.__init_cycle,
+            2: self.__init_pulse,
+            3: self.__init_monitor,
+            4: self.__init_display,
+            5: self.__init_cycleplus,
+            6: self.__init_pulseplus,
+            7: self.__init_flashplus,
+            9: self.__init_rocketup,
+            10: self.__init_rocketdown,
+            11: self.__init_killingfloor,
+            12: self.__init_checkpoint,
+            13: self.__init_teleport,
+            14: self.__init_flash,
+            15: self.__init_exit,
+            16: self.__init_enemy,
+            17: self.__init_cannonleft,
+            18: self.__init_cannonright,
+            19: self.__init_cannonup,
+            20: self.__init_cannondown,
+            21: self.__init_flashspecial,
+        }
 
     def __init_cycle(self, sidx, position):
         ends = self.get_anim_ends(sidx)
         sprites = self.get_anim(ends)
         entity = ga.Cycle(sprites, position)
         entity.frame = sidx - ends[0]
-        entity.set_initial_delay(self.get_sprite(sidx).init,
-                                 self.get_sprite(sidx).param)
+        entity.set_initial_delay(self.get_sprite(sidx).init, self.get_sprite(sidx).param)
         return entity
 
     def __init_cycleplus(self, sidx, position):
@@ -205,8 +216,7 @@ class Level(LevelData):
         sprites = self.get_anim(ends)
         entity = ga.Pulse(sprites, position)
         entity.frame = sidx - ends[0]
-        entity.set_initial_delay(self.get_sprite(sidx).init,
-                                 self.get_sprite(sidx).param)
+        entity.set_initial_delay(self.get_sprite(sidx).init, self.get_sprite(sidx).param)
         return entity
 
     def __init_pulseplus(self, sidx, position):
@@ -332,8 +342,7 @@ class Level(LevelData):
     def __get_active_entity(self, sidx, position):
         sprite = self.get_sprite(sidx)
         action = sprite.action
-        return self.init_functions.get(action, self.__init_display)(sidx,
-                                                                    position)
+        return self.init_functions.get(action, self.__init_display)(sidx, position)
 
     def load(self, name):
         self.__init__()
@@ -397,7 +406,6 @@ class Level(LevelData):
             entity = ga.Entity([sprite], position)
             screen.background.append(entity)
 
-
     def get_set(self, set_id):
         if set_id == 0:
             return self.set1
@@ -440,11 +448,14 @@ class Level(LevelData):
             anim.append(self.get_sprite(sidx))
         return anim
 
+
 # -----------------------------------------------------------------------------
 # test code below
 
+
 def main():
     import em
+
     game = em.Game()
     game.init()
     for l in range(8):
@@ -468,6 +479,7 @@ def main():
                         print("%s(%d) " % (key, value), end="")
                     print()
     game.quit()
+
 
 if __name__ == "__main__":
     main()

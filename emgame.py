@@ -1,10 +1,11 @@
 """Gameplay module"""
 
-import emglobals as gl
-import emdata as da
-import pygame
 import copy
 
+import pygame
+
+import emdata as da
+import emglobals as gl
 from emglobals import XY
 
 
@@ -15,6 +16,7 @@ class Controller:
     Joystick and gamepad controllers planned for the future.
     Singleton by design.
     """
+
     def __init__(self):
         # pylint complains when those are defined via calling clear()
         self.left = False
@@ -37,9 +39,7 @@ class Controller:
         self.clear()
         keys = pygame.key.get_pressed()
         mods = pygame.key.get_mods()
-        if not (mods & (pygame.KMOD_CTRL |
-                        pygame.KMOD_SHIFT |
-                        pygame.KMOD_ALT)):
+        if not (mods & (pygame.KMOD_CTRL | pygame.KMOD_SHIFT | pygame.KMOD_ALT)):
             if keys[pygame.K_LEFT]:
                 self.left = True
             if keys[pygame.K_RIGHT]:
@@ -56,6 +56,7 @@ class Controller:
 
 class FSM:
     """Very simple Finite State Machine for entities."""
+
     def __init__(self):
         self.next_state = None
         self.state = lambda: None
@@ -142,8 +143,7 @@ class Entity:
         # remove from the current screen first
         gl.screen_manager.get_screen().active.remove(self)
         # remove from the level definition
-        gl.screen_manager.delete_object(gl.screen_manager.get_screen_number(),
-                                        self.position)
+        gl.screen_manager.delete_object(gl.screen_manager.get_screen_number(), self.position)
 
     def update(self):
         """Standard empty update method."""
@@ -204,7 +204,7 @@ class Entity:
         at the start).
         Offset moves starting point before check is made.
         """
-        result = (gl.SCREEN_Y * (gl.SPRITE_Y + 1))
+        result = gl.SCREEN_Y * (gl.SPRITE_Y + 1)
         if screen:
             bbox = self.get_bbox()
             x = bbox.left + self.get_x()
@@ -212,7 +212,7 @@ class Entity:
             w = bbox.width
             h = (gl.SCREEN_Y * gl.SPRITE_Y) - y
             me = pygame.Rect(x, y, w, h)
-            #pygame.draw.rect(gl.display, pygame.Color(255, 255, 255), me, 1)
+            # pygame.draw.rect(gl.display, pygame.Color(255, 255, 255), me, 1)
             collided = []
             for obj in screen.collisions:
                 you = obj.get_bbox().copy()
@@ -305,8 +305,7 @@ class Entity:
         """Set initial delay depending on mode or object's position."""
         pos = self.get_position()
         if mode == 0:
-            self.delay = ((pos.x // gl.SPRITE_X)
-                          + (pos.y // gl.SPRITE_Y)) % (param + 1)
+            self.delay = ((pos.x // gl.SPRITE_X) + (pos.y // gl.SPRITE_Y)) % (param + 1)
         elif mode == 1:
             self.delay = (pos.x // gl.SPRITE_X) % (param + 1)
         elif mode == 2:
@@ -323,17 +322,19 @@ class Entity:
             self.frame = gl.random(len(self.sprites))
             self.delay = 0
 
+
 class ScreenManager:
     """
     Screen manager class.
     Manages rooms (screens) from loaded level.
     Singleton by design.
     """
+
     def __init__(self):
         self.current_screen = 0  # current screen
         self.screens = None  # all screens
         self.screen = None  # current screen definition
-        self.new_objects = [] # new objects created for current frame
+        self.new_objects = []  # new objects created for current frame
 
     def add_screens(self, screens):
         self.screens = screens
@@ -400,12 +401,14 @@ class ScreenManager:
             self.screen.active.extend(self.new_objects)
             self.new_objects = []
 
+
 class ActiveCheckpoint:
     """
     Active checkpoint class.
     References currently active checkpoint.
     Singleton by design.
     """
+
     def __init__(self):
         self.level = None
         self.screen = None
@@ -472,6 +475,7 @@ class CyclePlus(Entity):
         else:
             return 0
 
+
 class Pulse(Entity):
     def __init__(self, sprites, position):
         Entity.__init__(self, sprites, position)
@@ -530,6 +534,7 @@ class PulsePlus(Entity):
             return Entity.get_touch(self)
         else:
             return 0
+
 
 class Flash(Entity):
     def __init__(self, sprites, position):
@@ -666,8 +671,8 @@ class EnemyPlatform(Entity):
         pass
 
     def display(self):
-        gl.display.blit(self.anims[self.anim][self.frame].image,
-                        self.get_position())
+        gl.display.blit(self.anims[self.anim][self.frame].image, self.get_position())
+
 
 class EnemyFlying(Entity):
     def __init__(self, sprites, position):
@@ -682,14 +687,16 @@ class EnemyFlying(Entity):
         pass
 
     def display(self):
-        gl.display.blit(self.anims[self.anim][self.frame].image,
-                        self.get_position())
+        gl.display.blit(self.anims[self.anim][self.frame].image, self.get_position())
+
 
 # -----------------------------------------------------------------------------
 # test code below
 
+
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()

@@ -1,13 +1,15 @@
 """Display module"""
 
-import emglobals as gl
-from emglobals import XY
-import pygame
 import logging
 import time
 
+import pygame
 
-#noinspection PyArgumentEqualDefault
+import emglobals as gl
+from emglobals import XY
+
+
+# noinspection PyArgumentEqualDefault
 def init_display():
     pygame.init()
     gl.window = pygame.display.set_mode((640, 480), 0, 32)
@@ -33,8 +35,7 @@ def show():
     pygame.display.flip()
 
 
-def message(position, txt, font=None, antialias=False,
-            color=pygame.Color(255, 255, 255)):
+def message(position, txt, font=None, antialias=False, color=pygame.Color(255, 255, 255)):
     """
     Display message on the screen. Uses entire surface.
 
@@ -47,7 +48,7 @@ def message(position, txt, font=None, antialias=False,
     Return position of next line as XY(x, y).
     """
     font = gl.font["small"] if font is None else font
-    lines = txt.split('\n')
+    lines = txt.split("\n")
     cpos = XY.from_self(position)
     for line in lines:
         lsurf = font.render(line, antialias, color)
@@ -55,12 +56,14 @@ def message(position, txt, font=None, antialias=False,
         cpos.y += int(font.get_height() * 1.05)
     return cpos
 
+
 class InfoLines:
     """
     Several information lines.
     Autoscrolling up.
     Limited visibility time.
     """
+
     def __init__(self, position, max_lines, max_time):
         self.lines = []
         self.max_time = max_time
@@ -83,11 +86,13 @@ class InfoLines:
             self.lines.pop(0)
             self.update = time.time()
 
-info_lines = InfoLines(XY(180, 8), 5, 5) #default info lines buffer
+
+info_lines = InfoLines(XY(180, 8), 5, 5)  # default info lines buffer
+
 
 class DiskInfo:
     def __init__(self, position):
-        sprite = gl.info.get_sprite(3) # disk segments
+        sprite = gl.info.get_sprite(3)  # disk segments
         self.disk = sprite.image.subsurface(pygame.Rect(0, 0, 18, 16))
         self.position = position
         self.disks = 0
@@ -102,18 +107,22 @@ class DiskInfo:
                 gl.display.blit(self.disk, position)
                 position.x += 22
 
+
 class LEDBar:
     """
     LED bar display
     """
+
     def __init__(self, position, mapping):
         self.value = 0
-        sprite = gl.info.get_sprite(4) # LED indication segments
-        self.leds = [sprite.image.subsurface(pygame.Rect(0, 0, 16, 16)),
-                     sprite.image.subsurface(pygame.Rect(16, 0, 16, 16)),
-                     sprite.image.subsurface(pygame.Rect(32, 0, 16, 16)),
-                     sprite.image.subsurface(pygame.Rect(0, 16, 16, 16)),
-                     sprite.image.subsurface(pygame.Rect(16, 16, 16, 16))]
+        sprite = gl.info.get_sprite(4)  # LED indication segments
+        self.leds = [
+            sprite.image.subsurface(pygame.Rect(0, 0, 16, 16)),
+            sprite.image.subsurface(pygame.Rect(16, 0, 16, 16)),
+            sprite.image.subsurface(pygame.Rect(32, 0, 16, 16)),
+            sprite.image.subsurface(pygame.Rect(0, 16, 16, 16)),
+            sprite.image.subsurface(pygame.Rect(16, 16, 16, 16)),
+        ]
         self.position = position
         self.mapping = mapping
 
@@ -121,31 +130,39 @@ class LEDBar:
         self.value = value % 7
 
     def display(self):
-        #self.value = int(time.time()) % 7
+        # self.value = int(time.time()) % 7
         position = XY.from_self(self.position)
         for led in range(6):
             gl.display.blit(self.leds[self.mapping[self.value][led]], position)
             position.x += 16
         gl.display.blit(self.leds[4], position)
 
+
 class Indicators:
     def __init__(self):
-        self.left = LEDBar(XY(16, 352),
-                           [[2, 3, 3, 3, 3, 3],
-                            [0, 3, 3, 3, 3, 3],
-                            [0, 0, 3, 3, 3, 3],
-                            [0, 0, 1, 3, 3, 3],
-                            [0, 0, 1, 2, 3, 3],
-                            [0, 0, 1, 2, 2, 3],
-                            [0, 0, 1, 2, 2, 2]])
-        self.right = LEDBar(XY(512, 352),
-                           [[2, 3, 3, 3, 3, 3],
-                            [2, 1, 3, 3, 3, 3],
-                            [2, 1, 0, 3, 3, 3],
-                            [2, 1, 0, 0, 3, 3],
-                            [2, 1, 0, 0, 0, 3],
-                            [2, 1, 0, 0, 0, 0],
-                            [2, 1, 0, 0, 0, 0]]
+        self.left = LEDBar(
+            XY(16, 352),
+            [
+                [2, 3, 3, 3, 3, 3],
+                [0, 3, 3, 3, 3, 3],
+                [0, 0, 3, 3, 3, 3],
+                [0, 0, 1, 3, 3, 3],
+                [0, 0, 1, 2, 3, 3],
+                [0, 0, 1, 2, 2, 3],
+                [0, 0, 1, 2, 2, 2],
+            ],
+        )
+        self.right = LEDBar(
+            XY(512, 352),
+            [
+                [2, 3, 3, 3, 3, 3],
+                [2, 1, 3, 3, 3, 3],
+                [2, 1, 0, 3, 3, 3],
+                [2, 1, 0, 0, 3, 3],
+                [2, 1, 0, 0, 0, 3],
+                [2, 1, 0, 0, 0, 0],
+                [2, 1, 0, 0, 0, 0],
+            ],
         )
         self.disks = DiskInfo(XY(144, 352))
 
@@ -154,11 +171,13 @@ class Indicators:
         self.right.display()
         self.disks.display()
 
+
 class StatusLine:
     """
     Handle status line display.
     Singleton by design.
     """
+
     def __init__(self):
         self.message = ""
         self.font = gl.font["xsmall"]
@@ -172,6 +191,7 @@ class StatusLine:
         message(self.position, self.message, self.font)
         self.message = ""
 
+
 status_line = StatusLine()
 indicators = None
 
@@ -180,8 +200,7 @@ indicators = None
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(levelname)s: %(funcName)s(): %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(funcName)s(): %(message)s")
     init_display()
     loop = True
     while loop:

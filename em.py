@@ -2,13 +2,14 @@
 
 import logging
 
+import pygame
+
 import emdata as da
 import emdisplay as di
 import emgame as ga
 import emglobals as gl
 import emhero as pl
 import emother as ot
-import pygame
 from emglobals import XY
 
 
@@ -34,21 +35,23 @@ class Gameplay:
         # initialize rest
         self.loop = True
         self.screens_map = None
-        self.key_handlers = {pygame.K_ESCAPE: self.on_k_escape,
-                             pygame.K_TAB: self.on_k_tab,
-                             pygame.K_LEFT: self.on_k_left,
-                             pygame.K_RIGHT: self.on_k_right,
-                             pygame.K_UP: self.on_k_up,
-                             pygame.K_DOWN: self.on_k_down,
-                             pygame.K_1: self.on_k_1,
-                             pygame.K_2: self.on_k_2,
-                             pygame.K_3: self.on_k_3,
-                             pygame.K_4: self.on_k_4,
-                             pygame.K_5: self.on_k_5,
-                             pygame.K_6: self.on_k_6,
-                             pygame.K_7: self.on_k_7,
-                             pygame.K_8: self.on_k_8,
-                             pygame.K_0: self.on_k_0}
+        self.key_handlers = {
+            pygame.K_ESCAPE: self.on_k_escape,
+            pygame.K_TAB: self.on_k_tab,
+            pygame.K_LEFT: self.on_k_left,
+            pygame.K_RIGHT: self.on_k_right,
+            pygame.K_UP: self.on_k_up,
+            pygame.K_DOWN: self.on_k_down,
+            pygame.K_1: self.on_k_1,
+            pygame.K_2: self.on_k_2,
+            pygame.K_3: self.on_k_3,
+            pygame.K_4: self.on_k_4,
+            pygame.K_5: self.on_k_5,
+            pygame.K_6: self.on_k_6,
+            pygame.K_7: self.on_k_7,
+            pygame.K_8: self.on_k_8,
+            pygame.K_0: self.on_k_0,
+        }
         self.deferred = None
 
     def init_map(self):
@@ -257,8 +260,12 @@ class Gameplay:
 
     def show(self):
         """Display the screen."""
-        di.message(XY(500, 8), "logic: {0:>4.1f}\nrender: {1:>4.1f}".format(
-            round(gl.logic_time * 1000, 1), round(gl.render_time * 1000, 1)))
+        di.message(
+            XY(500, 8),
+            "logic: {0:>4.1f}\nrender: {1:>4.1f}".format(
+                round(gl.logic_time * 1000, 1), round(gl.render_time * 1000, 1)
+            ),
+        )
         di.show()
 
     def start(self):
@@ -303,9 +310,12 @@ class Game:
         if gl.log_filename:
             logging.basicConfig(level=logging.DEBUG)
         else:
-            logging.basicConfig(filename=gl.log_filename,
-                                filemode="w", format='%(levelname)s: %(funcName)s(): %(message)s',
-                                level=logging.DEBUG)
+            logging.basicConfig(
+                filename=gl.log_filename,
+                filemode="w",
+                format="%(levelname)s: %(funcName)s(): %(message)s",
+                level=logging.DEBUG,
+            )
 
     def init(self):
         di.init_display()
@@ -327,7 +337,11 @@ class Game:
 def profile_main():
     # This is the main function for profiling
     # We've renamed our original main() above to real_main()
-    import cProfile, pstats, StringIO
+    import cProfile
+    import pstats
+
+    import StringIO
+
     prof = cProfile.Profile()
     prof = prof.runctx("real_main()", globals(), locals())
     stream = StringIO.StringIO()
