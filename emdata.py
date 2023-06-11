@@ -105,11 +105,9 @@ class SpriteSet:
 
     def load(self, set_name):
         self.__init__()
-        set_file_path = os.path.join(gl.data_folder, set_name)
-        set_file_path = os.path.join(set_file_path, set_name)
-        set_file_path += ".ebs"
-        jfile = open(set_file_path, "rt")
-        self.set = json.load(jfile)
+        set_file_path = os.path.join(gl.data_folder, set_name, f"{set_name}.ebs")
+        with open(set_file_path, "rt") as f:
+            self.set = json.load(f)
         for spr in range(64):
             if self.is_used(spr):
                 sprite = SpriteData()
@@ -154,12 +152,9 @@ class LevelData:
         self.data = []
 
     def load(self, filename):
-        level_file_path = os.path.join(gl.data_folder, filename)
-        level_file_path += ".ebl"
-        jfile = open(level_file_path, "rt")
-        json_data = jfile.read()  # odczytaj zawartość pliku jako string
-        jfile.close()  # zamknij plik
-        self.data = json.loads(json_data)  # użyj json.loads z odczytanymi danymi
+        level_file_path = os.path.join(gl.data_folder, f"{filename}.ebl")
+        with open(level_file_path, "rt") as f:
+            self.data = json.load(f)
 
 
 # noinspection PyArgumentEqualDefault

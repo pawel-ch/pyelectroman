@@ -42,9 +42,8 @@ def load_data(set_name):
     global areas
     set_path = os.path.join("data", set_name)
     params_path = os.path.join(set_path, f"{set_name}.ebs")
-    f = open(params_path, "rt")
-    data = json.load(f)
-    f.close()
+    with open(params_path, "rt") as f:
+        data = json.load(f)
     sprites = []
     areas = [None] * 64
     for s in range(64):

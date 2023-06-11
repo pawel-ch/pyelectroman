@@ -1,6 +1,6 @@
 import glob
+import io
 import json
-import mmap
 import os
 import struct
 
@@ -24,8 +24,8 @@ class LevelFile:
         self.screens = []
 
     def open(self, filename):
-        self.file = open(filename, "r+b")
-        self.mapping = mmap.mmap(self.file.fileno(), 0)
+        with open(filename, "rb") as f:
+            self.mapping = io.BytesIO(f.read())
 
     def read(self):
         assert self.mapping is not None
@@ -132,9 +132,8 @@ def main():
             "names": level.get_names(),
             "screens": level.get_screens(),
         }
-        f = open(os.path.join(destination, "%s.ebl" % fname), "wt")
-        json.dump(jdata, f, sort_keys=True)
-        f.close()
+        with open(os.path.join(destination, f"{fname}.ebl"), "wt") as f:
+            json.dump(jdata, f, sort_keys=True)
     print("Done.")
 
 

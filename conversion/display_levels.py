@@ -42,8 +42,8 @@ def load_sprites(set1, set2):
 
 
 def load_level(filename):
-    f = open(filename, "rt")
-    level = json.load(f, encoding="ascii")
+    with open(filename, "rt") as f:
+        level = json.load(f, encoding="ascii")
     print("Loading level:", filename)
     global names, screens
     names = level["names"]
@@ -105,10 +105,9 @@ def main():
                 data = png_screens[y * 16 + x][prow]
                 png_data[srow].extend(data)
         print("Writing %s file..." % (lname + ".png"))
-        f = open(lname + ".png", "wb")
-        w = png.Writer(width=24 * 13 * 16, height=24 * 8 * TY, alpha=False)
-        w.write(f, png_data)
-        f.close()
+        with open(lname + ".png", "wb") as f:
+            w = png.Writer(width=24 * 13 * 16, height=24 * 8 * TY, alpha=False)
+            w.write(f, png_data)
     print("Done.")
 
 

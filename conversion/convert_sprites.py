@@ -1,6 +1,6 @@
 import glob
+import io
 import json
-import mmap
 import os
 import struct
 
@@ -320,7 +320,7 @@ class SpriteDefinition:
         self.index = 0
 
     def palette_lookup(self, index):
-        pindex = ord(self.VGA_colors[index])
+        pindex = ord(chr(self.VGA_colors[index]))
         alpha = (255, 0)[pindex == 0]
         color = palette[pindex]
         final = (color[0] * 4, color[1] * 4, color[2] * 4, alpha)
@@ -335,10 +335,10 @@ class SpriteDefinition:
         self.V16_colors = mapping.read(32)
         self.V32_colors = mapping.read(48)
         for pp in self.packed_pixels:
-            pv = (ord(pp) >> 4) & 0x0F
+            pv = (ord(chr(pp >> 4))) & 0x0F
             pixel = self.palette_lookup(pv)
             self.pixels.append(pixel)
-            pv = ord(pp) & 0x0F
+            pv = ord(chr(pp & 0x0F))
             pixel = self.palette_lookup(pv)
             self.pixels.append(pixel)
 
@@ -352,7 +352,6 @@ class SpriteDefinition:
 class GGSFile:
     def __init__(self):
         self.header = SpriteFileHeader()
-        self.file = None
         self.mapping = None
         self.status_table = ""
         self.size_table = ""
@@ -360,11 +359,8 @@ class GGSFile:
         self.definitions = []
 
     def open(self, filename):
-        try:
-            self.file = open(filename, "r+b")
-            self.mapping = mmap.mmap(self.file.fileno(), 0)
-        except IOError:
-            raise MyError("Error: cannot open sprite file.")
+        with open(filename, "r+b") as f:
+            self.mapping = io.BytesIO(f.read())
 
     def get_number(self):
         return len(self.definitions)
@@ -374,7 +370,7 @@ class GGSFile:
         self.status_table = self.mapping.read(512)
         self.size_table = self.mapping.read(256)
         self.future_size = self.mapping.read(2)
-        skip = ord(self.future_size[0]) + (ord(self.future_size[1]) << 8)
+        skip = ord(chr(self.future_size[0])) + (ord(chr(self.future_size[1] << 8)))
         skip = self.mapping.read(skip)
         for i in range(64):
             used = self.mapping.read(1)
@@ -405,7 +401,7 @@ def main():
             fname = os.path.split(filename)[1]
             fname = os.path.splitext(fname)[0]
             sprites_file = GGSFile()
-            sprites_file.open(os.path.join(folder, filename))
+            sprites_file.open(filename)
             sprites_file.read()
             print("File '%s' opened." % filename)
             print("%d sprites loaded." % sprites_file.get_number())
@@ -414,7 +410,6 @@ def main():
             sprites_path = os.path.join(destination, fname)
             if not os.path.exists(sprites_path):
                 os.mkdir(sprites_path)
-            f = open(os.path.join(sprites_path, "%s.ebs" % fname), "wt")
             used = []
             for sprite in sprites:
                 used.append((True, False)[sprite is None])
@@ -423,23 +418,26 @@ def main():
                 "size table": sprites_file.get_size_table(),
                 "used table": used,
             }
-            json.dump(jdata, f, sort_keys=True)
-            f.close()
+            with open(os.path.join(sprites_path, "%s.ebs" % fname), "wt") as f:
+                json.dump(jdata, f, sort_keys=True)
+                f.write("\n")
+            width = 24
+            height = 24
             for sprite in sprites:
                 if sprite is not None:
                     pixels = sprite.get_pixels()
                     png_data = []
-                    for row in range(24):
-                        png_data.append([])
-                        for col in range(24):
-                            for color in pixels[row * 24 + col]:
-                                png_data[row].append(color)
-                    name = "%s_%02d.png" % (fname, sprite.get_index())
+                    for row in range(height):
+                        row_data = []
+                        for column in range(width):
+                            pixel = pixels[row * height + column]
+                            row_data.extend(pixel)
+                        png_data.append(row_data)
+                    name = f"{fname}_{sprite.get_index():02d}.png"
                     sprite_filename = os.path.join(sprites_path, name)
-                    f = open(sprite_filename, "wb")
-                    w = png.Writer(width=24, height=24, alpha=True)
-                    w.write(f, png_data)
-                    f.close()
+                    w = png.Writer(width=width, height=height, alpha=True, greyscale=False)
+                    with open(sprite_filename, "wb") as f:
+                        w.write(f, png_data)
             print("File processed successfully.")
         print("All done.")
     except MyError as error:
