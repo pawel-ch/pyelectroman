@@ -55,7 +55,7 @@ class SpriteData:
         w = ((status_bytes[5] & 0x7F) - (status_bytes[4] & 0x7F)) * 2
         h = ((status_bytes[7] & 0x7F) - (status_bytes[6] & 0x7F)) * 2
         self.bbox = pygame.Rect(x, y, w, h)
-        # set up collisins for all sides from status bytes
+        # set up collisions for all sides from status bytes
         for col in range(4):
             self.collide["LRTB"[col]] = (status_bytes[4 + col] & 0x80) == 0
 
