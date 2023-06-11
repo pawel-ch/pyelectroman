@@ -15,7 +15,7 @@ sprites = [None] * 128
 def load_sprite(filename):
     filename = filename.encode("ascii")
     if os.path.exists(filename):
-        r = png.Reader(filename)
+        r = png.Reader(filename=filename)
         sprite = r.asRGBA()
         assert sprite[0] == 24
         assert sprite[1] == 24
@@ -26,7 +26,7 @@ def load_sprite(filename):
 
 def load_sprites(set1, set2):
     global sprites
-    print("Loading sprite sets: %s, %s" % (set1, set2))
+    print(f"Loading sprite sets: {set1}, {set2}")
     for sprite in range(1, 128):
         if sprite < 64:
             sfilebase = os.path.join(folder, set1)
@@ -36,13 +36,13 @@ def load_sprites(set1, set2):
             sfilebase = os.path.join(folder, set2)
             sfilebase = os.path.join(sfilebase, set2)
             snum = sprite - 64
-        sfile = sfilebase + "_%02d.png" % snum
+        sfile = f"{sfilebase}_{snum:02d}.png"
         sprites[sprite] = load_sprite(sfile)
 
 
 def load_level(filename):
-    with open(filename, "rt") as f:
-        level = json.load(f, encoding="ascii")
+    with open(filename, "rt", encoding="ascii") as f:
+        level = json.load(f)
     print("Loading level:", filename)
     global names, screens
     names = level["names"]
@@ -86,7 +86,7 @@ TY = 16
 
 
 def main():
-    levels = glob.glob(os.path.join(folder, "*.dat"))
+    levels = glob.glob(os.path.join(folder, "*.ebl"))
     for level in levels:
         png_screens = []
         lname = os.path.splitext(os.path.split(level)[1])[0]
@@ -105,7 +105,7 @@ def main():
                 png_data[srow].extend(data)
         print("Writing %s file..." % (lname + ".png"))
         with open(lname + ".png", "wb") as f:
-            w = png.Writer(width=24 * 13 * 16, height=24 * 8 * TY, alpha=False)
+            w = png.Writer(width=24 * 13 * 16, height=24 * 8 * TY, alpha=False, greyscale=False)
             w.write(f, png_data)
     print("Done.")
 
