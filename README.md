@@ -1,4 +1,4 @@
-PyElectroMan is a Python port of 1992 PC game Electro Man (aka Electro Body, a cult game in Poland where it was developed).
+PyElectroMan is an unfinished Python rewrite of 1992 PC game Electro Man (aka Electro Body, a cult game in Poland where it was developed).
 
 The project has been started to improve author's Python skills rather than to eventually become a released game, but it's fate will be determined by those who decide to take it further.
 
