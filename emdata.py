@@ -316,20 +316,8 @@ class Level(LevelData):
 
     def __init_enemy(self, sidx, position):
         sprite = self.get_sprite(sidx)
-        if sprite is None or sprite.param is None:
-            # Handle the case when sprite or sprite.param is None
-            # Set appropriate default values or raise an exception
-            num = 0
-        else:
-            num = (sprite.param & 0x7F) / 3
-
-        if gl.enemies is not None and hasattr(gl.enemies, "get_anims"):
-            anims, frames = gl.enemies.get_anims(num)
-        else:
-            # Handle the case when gl.enemies is None or doesn't have the get_anims attribute
-            # Set appropriate default values for anims and frames or raise an exception
-            anims = []
-            frames = []
+        num = (sprite.param & 0x7F) / 3
+        anims, frames = gl.enemies.get_anims(num)
         if num == 2:  # enemy types can be hardcoded
             entity = ga.EnemyFlying([sprite], position)
         else:
@@ -379,8 +367,8 @@ class Level(LevelData):
         action = sprite.action
         param = sprite.param
         position = XY(x * gl.SPRITE_X, y * gl.SPRITE_Y)
+        entity = ga.Entity([sprite], position)
         if (flags == 0x80) & (action == 0):
-            entity = ga.Entity([sprite], position)
             screen.collisions.append(entity)
         elif flags & 0x80:
             entity = self.__get_active_entity(sidx, position)
@@ -393,15 +381,10 @@ class Level(LevelData):
             entity.set_origin(screen)  # remember screen for deletion
             screen.active.append(entity)
 
-        entity = 42
         if isinstance(entity, ga.Checkpoint) and param == 1:
             # active checkpoint - level start
-            if self.name in gl.level_names:
-                level_number = gl.level_names.index(self.name)
-                gl.checkpoint.update(level_number, screen_number, position)
-            else:
-                # Handle the case when self.name is not found in gl.level_names
-                print("Error: Level name not found in gl.level_names")
+            level_number = gl.level_names.index(self.name)
+            gl.checkpoint.update(level_number, screen_number, position)
         else:
             entity = ga.Entity([sprite], position)
             screen.background.append(entity)
