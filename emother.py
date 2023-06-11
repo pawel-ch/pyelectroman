@@ -51,7 +51,7 @@ class Enemies:
 
     def get_anims(self, enemy_num):
         enemy_index = int(enemy_num)
-        return (self.enemy[enemy_index].anims, self.enemy[enemy_index].frames)
+        return self.enemy[enemy_index].anims, self.enemy[enemy_index].frames
 
 
 class WeaponData:
