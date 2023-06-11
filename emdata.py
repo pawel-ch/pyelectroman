@@ -40,7 +40,7 @@ class SpriteData:
         self.__init__()
         self.sidx = number
         set_file_path = os.path.join(gl.data_folder, set_name)
-        image_file_path = os.path.join(set_file_path, set_name + "_%02d.png" % number)
+        image_file_path = os.path.join(set_file_path, f"{set_name}_{number:02d}.png")
         self.image = pygame.image.load(image_file_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (gl.SPRITE_X, gl.SPRITE_Y))
         # set up sprite information from status bytes

@@ -41,14 +41,14 @@ def load_data(set_name):
     global sprites
     global areas
     set_path = os.path.join("data", set_name)
-    params_path = os.path.join(set_path, set_name + ".ebs")
+    params_path = os.path.join(set_path, f"{set_name}.ebs")
     f = open(params_path, "rt")
     data = json.load(f)
     f.close()
     sprites = []
     areas = [None] * 64
     for s in range(64):
-        sprite_path = os.path.join(set_path, set_name + "_%02d.png" % s)
+        sprite_path = os.path.join(set_path, f"{set_name}_{s:02d}.png")
         if data["used table"][s]:
             img = pygame.image.load(sprite_path).convert_alpha()
             img = pygame.transform.scale2x(img)
