@@ -31,13 +31,9 @@ class LevelFile:
         assert self.mapping is not None
         self.header = self.mapping.read(32)
         self.names.append(self.mapping.read(9))
-        self.names[0] = (self.names[0], self.names[0][: self.names[0].index("\x00")])[
-            self.names[0][-1] == "\x00"
-        ]
+        self.names[0] = self.names[0].rstrip(b"\x00").decode("utf-8")
         self.names.append(self.mapping.read(9))
-        self.names[1] = (self.names[1], self.names[1][: self.names[1].index("\x00")])[
-            self.names[1][-1] == "\x00"
-        ]
+        self.names[1] = self.names[1].rstrip(b"\x00").decode("utf-8")
         self.names[0] = self.names[0].lower()
         self.names[1] = self.names[1].lower()
         self.params = struct.unpack("16B", self.mapping.read(16))
@@ -56,7 +52,12 @@ class LevelFile:
                 self.mapping.read(8)
             else:
                 self.screen_offsets.append(None)
-        level_data_size = self.mapping.size() - self.mapping.tell()
+
+        current_position = self.mapping.tell()
+        self.mapping.seek(0, 2)
+        level_data_size = self.mapping.tell() - current_position
+        self.mapping.seek(current_position, 0)
+
         self.level_data = self.mapping.read(level_data_size)
         self.level_data = list(struct.unpack("%dB" % level_data_size, self.level_data))
         for scr in range(256):
@@ -134,6 +135,7 @@ def main():
         }
         with open(os.path.join(destination, f"{fname}.ebl"), "wt") as f:
             json.dump(jdata, f, sort_keys=True)
+            f.write("\n")
     print("Done.")
 
 
