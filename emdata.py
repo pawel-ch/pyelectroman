@@ -436,6 +436,8 @@ def main():
 
     game = em.Game()
     game.init()
+    gameplay = em.Gameplay()
+
     for l in range(8):
         lname = gl.level_names[l]
         print("Level:", lname)
@@ -456,6 +458,10 @@ def main():
                     for key, value in actives.items():
                         print("%s(%d) " % (key, value), end="")
                     print()
+    gameplay.start()
+    gameplay.run()
+    gameplay.stop()
+
     game.quit()
 
 
