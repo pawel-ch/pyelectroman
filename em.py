@@ -1,6 +1,7 @@
 """Main game module"""
 
 import logging
+import time
 
 import pygame
 
@@ -52,7 +53,7 @@ class Gameplay:
             pygame.K_8: self.on_k_8,
             pygame.K_0: self.on_k_0,
         }
-        self.deferred = None
+        self.deferred = []
 
     def init_map(self):
         """Initialize level map"""
@@ -294,10 +295,9 @@ class Gameplay:
     def stop(self):
         pass
 
-
-def show_info():
-    """Display status line"""
-    di.status_line.show()
+    def show_info(self):
+        """Display status line"""
+        di.status_line.show()
 
 
 class Game:
@@ -324,14 +324,15 @@ class Game:
     def quit(self):
         di.quit_display()
 
-    def fast_main(self):
-        game = Game()
-        game.init()
-        gameplay = Gameplay()
-        gameplay.start()
-        gameplay.run()
-        gameplay.stop()
-        game.quit()
+
+def fast_main():
+    game = Game()
+    game.init()
+    gameplay = Gameplay()
+    gameplay.start()
+    gameplay.run()
+    gameplay.stop()
+    game.quit()
 
 
 def profile_main():
@@ -339,12 +340,11 @@ def profile_main():
     # We've renamed our original main() above to real_main()
     import cProfile
     import pstats
-
-    import StringIO
+    from io import StringIO
 
     prof = cProfile.Profile()
-    prof = prof.runctx("real_main()", globals(), locals())
-    stream = StringIO.StringIO()
+    prof = prof.runctx("fast_main()", globals(), locals())
+    stream = StringIO()
     stats = pstats.Stats(prof, stream=stream)
     stats.sort_stats("calls")
     stats.print_stats(80)  # how many to print
@@ -353,7 +353,6 @@ def profile_main():
     # stats.print_callers()
     logging.info("Profile data:\n%s", stream.getvalue())
 
-    main = fast_main()
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    profile_main()
