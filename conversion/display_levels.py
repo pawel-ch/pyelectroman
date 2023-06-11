@@ -82,6 +82,7 @@ TY = 16
 
 def main():
     levels = glob.glob(os.path.join(folder, "*.ebl"))
+    output_dir = os.path.join("..", "maps")
     for level in levels:
         png_screens = []
         level_name = os.path.splitext(os.path.split(level)[1])[0]
@@ -99,7 +100,7 @@ def main():
                 data = png_screens[y * 16 + x][prow]
                 png_data[srow].extend(data)
         print("Writing %s file..." % (level_name + ".png"))
-        with open(f"{level_name}.png", "wb") as f:
+        with open(os.path.join(output_dir, f"{level_name}.png"), "wb") as f:
             w = png.Writer(width=24 * 13 * 16, height=24 * 8 * TY, alpha=False, greyscale=False)
             w.write(f, png_data)
     print("Done.")
