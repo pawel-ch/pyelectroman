@@ -131,7 +131,7 @@ class SpriteSet:
 
     def get_sprite(self, number):
         """Return sprite[number] from the set"""
-        assert number >= 0 and number < 64
+        assert 0 <= number < 64
         return self.sprites[number]
 
     def get_anim(self, ends):
@@ -396,14 +396,14 @@ class Level(LevelData):
             return self.set2
 
     def get_screen(self, screen):
-        assert screen >= 0 and screen < 256
+        assert 0 <= screen < 256
         return self.screens[screen]
 
     def get_screens(self):
         return self.screens
 
     def get_sprite(self, number):
-        assert number >= 0 and number < 128
+        assert 0 <= number < 128
         if number < 64:
             return self.set1.get_sprite(number)
         else:
