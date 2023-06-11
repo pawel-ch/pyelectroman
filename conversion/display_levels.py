@@ -28,7 +28,6 @@ def load_sprites(set1, set2):
     global sprites
     print("Loading sprite sets: %s, %s" % (set1, set2))
     for sprite in range(1, 128):
-        snum = (sprite, sprite - 64)[sprite >= 64]
         if sprite < 64:
             sfilebase = os.path.join(folder, set1)
             sfilebase = os.path.join(sfilebase, set1)
