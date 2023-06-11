@@ -449,7 +449,7 @@ def main():
     game.init()
     for l in range(8):
         lname = gl.level_names[l]
-        print ("Level:"), lname
+        print("Level:", lname)
         level = Level()
         level.load(lname)
         for s in range(256):
