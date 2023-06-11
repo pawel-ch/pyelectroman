@@ -98,7 +98,7 @@ def main():
         png_data = []
         for srow in range(24 * 8 * TY):
             png_data.append([])
-            y = srow / (24 * 8)
+            y = srow // (24 * 8)
             prow = srow % (24 * 8)
             for x in range(16):
                 data = png_screens[y * 16 + x][prow]
